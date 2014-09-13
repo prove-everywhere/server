@@ -48,6 +48,7 @@ sweeper coqtopMap minute = do
 server :: Config -> MVar CoqtopMap -> MVar Int -> Application
 server config coqtopMap seed req respond = handle unknownError $
     case (pathInfo req, requestMethod req) of
+        (["list"], "GET") -> list
         (["start"], "POST") -> start
         (["command", n], "POST") | isNatural n -> command $ read $ T.unpack n
         (["terminate", n], "DELETE") | isNatural n -> terminate $ read $ T.unpack n
@@ -71,6 +72,10 @@ server config coqtopMap seed req respond = handle unknownError $
 
     unknownError :: SomeException -> IO ResponseReceived
     unknownError = respond . errorResponse . UnknownError . T.pack . show
+
+    list = do
+        coqtops <- withMVar coqtopMap $ return . HM.elems
+        respond $ responseJSON status200 coqtops
 
     start = case configMaxNumProcs config of
         Nothing -> start'

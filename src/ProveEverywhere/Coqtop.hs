@@ -132,7 +132,6 @@ hGetOutputPair :: (Handle, Handle) -> IO (Either ServerError (Text, CoqtopState)
 hGetOutputPair (out, err) = do
     p <- errOutput -- wait stderr
     o <- T.strip . E.decodeUtf8 <$> hGetOutput out
-    print p
     case parsePrompt p of
         Left perr -> return $ Left $ PromptParseError perr
         Right prompt -> return $ Right (o, prompt)

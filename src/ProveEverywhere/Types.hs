@@ -31,6 +31,13 @@ data Coqtop = Coqtop
     , coqtopLastModified :: UTCTime
     }
 
+instance ToJSON Coqtop where
+    toJSON coqtop = object
+        [ "id" .= coqtopId coqtop
+        , "state" .= coqtopState coqtop
+        , "last_modified" .= coqtopLastModified coqtop
+        ]
+
 data InitialInfo = InitialInfo
     { initialInfoId :: Int -- ^ coqtop id
     , initialInfoOutput :: Text -- ^ coqtop initial output

@@ -23,6 +23,38 @@ See: `prove-everywhere-server --help`
 API
 ---
 
+### GET /list
+
+This API returns coqtop list.
+
+#### example input
+
+nothing to input
+
+#### example output
+
+```json
+[{
+  "last_modified": "2014-09-13T04:49:55.023Z",
+  "state": {
+    "current_theorem": "Coq",
+    "whole_state_number": 2,
+    "theorem_stack": [],
+    "theorem_state_number": 0
+  },
+  "id": 0
+}, {
+  "last_modified": "2014-09-13T04:49:57.726Z",
+  "state": {
+    "current_theorem": "Coq",
+    "whole_state_number": 2,
+    "theorem_stack": [],
+    "theorem_state_number": 0
+  },
+  "id": 1
+}]
+```
+
 ### POST /start
 
 This API starts new coqtop process and returns initial information.
