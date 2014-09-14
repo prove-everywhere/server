@@ -1,12 +1,10 @@
-
 module Main where
 
-import Control.Exception
 import Options.Applicative
-import System.Process
 
 import ProveEverywhere.Types
 import ProveEverywhere.Server
+import ProveEverywhere.Coqtop (getCoqtopVersion)
 
 main :: IO ()
 main = do
@@ -43,16 +41,3 @@ configParser = Config
                    short 't' <>
                    metavar "KILL_TIME" <>
                    help "The time to terminate unused coqtop process (unit of time: minute) (default: infinity)"))
-
-getCoqtopVersion :: IO (Maybe (Int, Int, Int)) -- e.g., (8, 4, 4) = 8.4pl4
-getCoqtopVersion = handle failure $ do
-    v_all <- readProcess "coqtop" ["-v"] ""
-    let [n_str, '.', m_str, 'p', 'l', p_str]
-            = drop (length "The Coq Proof Assistant, version ")
-            . take (length "The Coq Proof Assistant, version *.*pl*")
-            $ v_all
-    let (n, m, p) = (read [n_str], read [m_str], read [p_str])
-    return (Just (n, m, p))
-  where
-    failure :: IOError -> IO (Maybe (Int, Int, Int))
-    failure _ = return Nothing

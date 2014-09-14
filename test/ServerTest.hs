@@ -15,9 +15,12 @@ import Network.Wai.Test (simpleBody)
 
 import ProveEverywhere.Types
 import ProveEverywhere.Server
+import ProveEverywhere.Coqtop
 
 main :: IO ()
-main = hspec spec
+main = hspec $ do
+    coqtop
+    spec
 
 app :: IO Application
 app = do
@@ -31,6 +34,13 @@ app = do
         , configKillTime = Nothing
         }
 
+coqtop :: Spec
+coqtop = describe "coqtop (> 8.4)" $ do
+    it "should be installed" $ do
+        v <- getCoqtopVersion
+        v `shouldSatisfy` isJust
+        v `shouldSatisfy` (\v' -> v' > Just (8, 4, 0))
+
 spec :: Spec
 spec = with app $ do
     describe "/start" $ do
@@ -40,5 +50,4 @@ spec = with app $ do
             res <- post "/start" ""
             let info = decode $ simpleBody res
             liftIO $ info `shouldSatisfy` isJust
-            let Just i = info
-            liftIO $ initialInfoId i `shouldBe` 0
+            liftIO $ fmap initialInfoId info `shouldBe` (Just 0)

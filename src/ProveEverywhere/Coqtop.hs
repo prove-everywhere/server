@@ -3,6 +3,7 @@
 module ProveEverywhere.Coqtop where
 
 import Control.Applicative ((<$>))
+import qualified Control.Exception as E
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as B
 import Data.Text (Text)
@@ -16,6 +17,19 @@ import System.IO
 import ProveEverywhere.Util
 import ProveEverywhere.Types
 import ProveEverywhere.Parser
+
+getCoqtopVersion :: IO (Maybe (Int, Int, Int)) -- e.g., (8, 4, 4) = 8.4pl4
+getCoqtopVersion = E.handle failure $ do
+    v_all <- readProcess "coqtop" ["-v"] ""
+    let [n_str, '.', m_str, 'p', 'l', p_str]
+            = drop (length ("The Coq Proof Assistant, version " :: String))
+            . take (length ("The Coq Proof Assistant, version *.*pl*" :: String))
+            $ v_all
+    let (n, m, p) = (read [n_str], read [m_str], read [p_str])
+    return (Just (n, m, p))
+  where
+    failure :: IOError -> IO (Maybe (Int, Int, Int))
+    failure _ = return Nothing
 
 startCoqtop :: Int -> IO (Either ServerError (Coqtop, Text))
 startCoqtop n = do
