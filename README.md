@@ -3,7 +3,7 @@ prove-everywhere-server
 
 [![wercker status](https://app.wercker.com/status/dfb2fb859ad25f5518439b14907a2cd5/m "wercker status")](https://app.wercker.com/project/bykey/dfb2fb859ad25f5518439b14907a2cd5)
 
-This directory provides the server for ProveEverywhere.
+This repository provides the server for ProveEverywhere.
 
 You can also use this as a coqtop server.
 
@@ -13,8 +13,15 @@ Installation
 This is written in Haskell, so cabal is required in order to install.
 
 ```sh
-$ cd /path/to/prove-everywhere/server
+$ git clone git://github.com/prove-everywhere/server.git
+$ cd server
 $ cabal install
+```
+
+or simply,
+
+```sh
+$ cabal install prove-everywhere-server
 ```
 
 Usage
