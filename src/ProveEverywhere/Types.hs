@@ -2,9 +2,10 @@
 
 module ProveEverywhere.Types where
 
-import Control.Applicative ((<$>), (<*>), empty)
+import Control.Applicative ((<$>), (<*>), empty, pure)
 import Data.Aeson
 import Data.ByteString (ByteString)
+import qualified Data.HashMap.Strict as HM
 import Data.Monoid
 import Data.Text (Text)
 import qualified Data.Text as T
@@ -31,12 +32,36 @@ data Coqtop = Coqtop
     , coqtopLastModified :: UTCTime
     }
 
+instance Eq Coqtop where
+    c1 == c2 = coqtopId c1 == coqtopId c2
+
+instance Show Coqtop where
+    show (Coqtop i _ _ _ _ st time) = unlines
+        [ "Coqtop {"
+        , "  id: " ++ show i
+        , "  state: " ++ show st
+        , "  last_modified: " ++ show time
+        , "}"
+        ]
+
 instance ToJSON Coqtop where
     toJSON coqtop = object
         [ "id" .= coqtopId coqtop
         , "state" .= coqtopState coqtop
         , "last_modified" .= coqtopLastModified coqtop
         ]
+
+-- | only test
+instance FromJSON Coqtop where
+    parseJSON (Object v) = Coqtop <$>
+                           v .: "id" <*>
+                           pure undefined <*>
+                           pure undefined <*>
+                           pure undefined <*>
+                           pure undefined <*>
+                           v .: "state" <*>
+                           v .: "last_modified"
+    parseJSON _ = empty
 
 data InitialInfo = InitialInfo
     { initialInfoId :: Int -- ^ coqtop id
@@ -187,3 +212,7 @@ data EmptyObject = EmptyObject deriving (Eq, Show)
 
 instance ToJSON EmptyObject where
     toJSON EmptyObject = object []
+
+instance FromJSON EmptyObject where
+    parseJSON (Object v) | HM.null v = pure EmptyObject
+    parseJSON _ = empty

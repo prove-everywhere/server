@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, QuasiQuotes #-}
 
 module Main where
 
@@ -46,7 +46,22 @@ spec = with app $ do
     describe "/start" $ do
         it "responds 200" $ do
             post "/start" "" `shouldRespondWith` 200
-        it "responds with ID: 0" $ do
+        it "responds inifial_info (ID: 0)" $ do
             res <- post "/start" ""
             let info = decode $ simpleBody res
             liftIO $ fmap initialInfoId info `shouldBe` (Just 0)
+
+    describe "/list" $ do
+        it "responds nil when no coqtop" $ do
+            res <- get "/list"
+            let l = decode $ simpleBody res
+            liftIO $ l `shouldBe` (Just [] :: Maybe [Coqtop])
+        it "responds coqtop list" $ do
+            post "/start" "" `shouldRespondWith` 200
+            post "/start" "" `shouldRespondWith` 200
+            post "/start" "" `shouldRespondWith` 200
+            res <- get "/list"
+            let l = decode $ simpleBody res
+            liftIO $ l `shouldBe` (Just [coqtopOf 0, coqtopOf 1, coqtopOf 2])
+  where
+    coqtopOf n = Coqtop n undefined undefined undefined undefined undefined undefined
