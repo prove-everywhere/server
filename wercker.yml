@@ -5,6 +5,7 @@ build:
         name: install dependencies
         code: |
           cabal update
+          cabal install happy
           cabal install --only-dependencies --enable-tests
     - script:
         name: build
