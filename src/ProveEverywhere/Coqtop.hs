@@ -22,8 +22,8 @@ getCoqtopVersion :: IO (Maybe (Int, Int, Int)) -- e.g., (8, 4, 4) = 8.4pl4
 getCoqtopVersion = E.handle failure $ do
     v_all <- readProcess "coqtop" ["-v"] ""
     let [n_str, '.', m_str, 'p', 'l', p_str]
-            = drop (length ("The Coq Proof Assistant, version " :: String))
-            . take (length ("The Coq Proof Assistant, version *.*pl*" :: String))
+            = drop (T.length "The Coq Proof Assistant, version ")
+            . take (T.length "The Coq Proof Assistant, version *.*pl*")
             $ v_all
     let (n, m, p) = (read [n_str], read [m_str], read [p_str])
     return (Just (n, m, p))

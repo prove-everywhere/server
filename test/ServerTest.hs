@@ -39,7 +39,7 @@ coqtop = describe "coqtop (> 8.4)" $ do
     it "should be installed" $ do
         v <- getCoqtopVersion
         v `shouldSatisfy` isJust
-        v `shouldSatisfy` (\v' -> v' > Just (8, 4, 0))
+        v `shouldSatisfy` (> Just (8, 4, 0))
 
 spec :: Spec
 spec = with app $ do
@@ -49,5 +49,4 @@ spec = with app $ do
         it "responds with ID: 0" $ do
             res <- post "/start" ""
             let info = decode $ simpleBody res
-            liftIO $ info `shouldSatisfy` isJust
             liftIO $ fmap initialInfoId info `shouldBe` (Just 0)
