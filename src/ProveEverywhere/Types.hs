@@ -2,7 +2,7 @@
 
 module ProveEverywhere.Types where
 
-import Control.Applicative ((<$>))
+import Control.Applicative ((<$>), (<*>), empty)
 import Data.Aeson
 import Data.ByteString (ByteString)
 import Data.Monoid
@@ -50,6 +50,13 @@ instance ToJSON InitialInfo where
         , "output" .= initialInfoOutput info
         , "state" .= toJSON (initialInfoState info)
         ]
+
+instance FromJSON InitialInfo where
+    parseJSON (Object v) = InitialInfo <$>
+                           v .: "id" <*>
+                           v .: "output" <*>
+                           v .: "state"
+    parseJSON _ = empty
 
 -- | The data type of output of coqtop.
 -- done + remain == length (sent_commands)
@@ -139,6 +146,14 @@ instance ToJSON CoqtopState where
         , "theorem_stack" .= promptTheoremStack prompt
         , "theorem_state_number" .= promptTheoremStateNumber prompt
         ]
+
+instance FromJSON CoqtopState where
+    parseJSON (Object v) = CoqtopState <$>
+                           v .: "current_theorem" <*>
+                           v .: "whole_state_number" <*>
+                           v .: "theorem_stack" <*>
+                           v .: "theorem_state_number"
+    parseJSON _ = empty
 
 data Command = Command Text deriving (Eq, Show)
 
