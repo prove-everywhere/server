@@ -4,11 +4,14 @@ module Main where
 
 import Control.Concurrent.MVar
 import Data.Aeson (decode)
+import qualified Data.ByteString.Char8 as BS
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (isJust)
+import Data.Monoid ((<>))
 
 import Test.Hspec
 import Test.Hspec.Wai
+import qualified Test.Hspec.Wai as T
 
 import Network.Wai (Application)
 import Network.Wai.Test (simpleBody)
@@ -63,5 +66,17 @@ spec = with app $ do
             res <- get "/list"
             let l = decode $ simpleBody res
             liftIO $ l `shouldBe` (Just [coqtopOf 0, coqtopOf 1, coqtopOf 2])
+
+    describe "/terminate" $ do
+        it "responds empty object meaning success" $ do
+            res <- post "/start" ""
+            let Just info = decode $ simpleBody res
+            res' <- T.delete ("/terminate/" <> showBS (initialInfoId info))
+            let e = decode $ simpleBody res'
+            liftIO $ e `shouldBe` (Just EmptyObject)
+        it "responds 404 when no such coqtop" $ do
+            T.delete "/terminate/0" `shouldRespondWith` 404
   where
     coqtopOf n = Coqtop n undefined undefined undefined undefined undefined undefined
+    showBS :: Show a => a -> BS.ByteString
+    showBS = BS.pack . show
