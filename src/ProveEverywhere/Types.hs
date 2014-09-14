@@ -92,7 +92,7 @@ data CoqtopOutput = CoqtopOutput
     , coqtopOutputLast :: Maybe Output -- ^ last output (except error)
     , coqtopOutputError :: Maybe Output -- ^ error output
     , coqtopOutputState :: CoqtopState -- ^ last state
-    }
+    } deriving (Eq, Show)
 
 instance ToJSON CoqtopOutput where
     toJSON output = object
@@ -103,6 +103,16 @@ instance ToJSON CoqtopOutput where
         , "error_output" .= coqtopOutputError output
         , "state" .= coqtopOutputState output
         ]
+
+instance FromJSON CoqtopOutput where
+    parseJSON (Object v) = CoqtopOutput <$>
+                           v .: "id" <*>
+                           v .: "succeeded" <*>
+                           v .: "remaining" <*>
+                           v .:? "last_output" <*>
+                           v .:? "error_output" <*>
+                           v .: "state"
+    parseJSON _ = empty
 
 data ServerError
     = NoSuchCoqtopError Int
@@ -182,6 +192,11 @@ instance FromJSON CoqtopState where
 
 data Command = Command Text deriving (Eq, Show)
 
+instance ToJSON Command where
+    toJSON (Command t) = object
+        [ "command" .= t
+        ]
+
 instance FromJSON Command where
     parseJSON (Object v) = Command <$>
         v .: "command"
@@ -198,6 +213,12 @@ instance ToJSON Output where
         , "output" .= outputText output
         ]
 
+instance FromJSON Output where
+    parseJSON (Object v) = Output <$>
+                           v .: "type" <*>
+                           v .: "output"
+    parseJSON _ = empty
+
 data OutputType = ErrorOutput
                 | InfoOutput
                 | ProofOutput
@@ -207,6 +228,12 @@ instance ToJSON OutputType where
     toJSON ErrorOutput = String "error"
     toJSON InfoOutput = String "info"
     toJSON ProofOutput = String "proof"
+
+instance FromJSON OutputType where
+    parseJSON (String "error") = pure ErrorOutput
+    parseJSON (String "info") = pure InfoOutput
+    parseJSON (String "proof") = pure ProofOutput
+    parseJSON _ = empty
 
 data EmptyObject = EmptyObject deriving (Eq, Show)
 

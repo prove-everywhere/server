@@ -3,7 +3,8 @@
 module Main where
 
 import Control.Concurrent.MVar
-import Data.Aeson (decode)
+import Control.Monad (join)
+import Data.Aeson (decode, encode)
 import qualified Data.ByteString.Char8 as BS
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (isJust)
@@ -69,14 +70,44 @@ spec = with app $ do
 
     describe "/terminate" $ do
         it "responds empty object meaning success" $ do
-            res <- post "/start" ""
-            let Just info = decode $ simpleBody res
-            res' <- T.delete ("/terminate/" <> showBS (initialInfoId info))
-            let e = decode $ simpleBody res'
+            cId <- newCoqtop
+            res <- T.delete ("/terminate/" <> showBS cId)
+            let e = decode $ simpleBody res
             liftIO $ e `shouldBe` (Just EmptyObject)
         it "responds 404 when no such coqtop" $ do
             T.delete "/terminate/0" `shouldRespondWith` 404
+
+    describe "/command" $ do
+        it "responds info output when sending Require Import _" $ do
+            cId <- newCoqtop
+            let command = Command "Require Import ssreflect."
+            res <- post ("/command/" <> showBS cId) (encode command)
+            let output = decode $ simpleBody res
+            liftIO $ output `shouldSatisfy` isJust
+            liftIO $ output `shouldSatisfy` (isJust . join . fmap coqtopOutputLast)
+            liftIO $ (fmap outputType . join . fmap coqtopOutputLast) output `shouldBe` (Just InfoOutput)
+        it "responds proof output when sending Goal _" $ do
+            cId <- newCoqtop
+            let command = Command "Goal forall P Q : Prop, (P -> Q) -> P -> Q."
+            res <- post ("/command/" <> showBS cId) (encode command)
+            let output = decode $ simpleBody res
+            liftIO $ output `shouldSatisfy` isJust
+            liftIO $ output `shouldSatisfy` (isJust . join . fmap coqtopOutputLast)
+            liftIO $ (fmap outputType . join . fmap coqtopOutputLast) output `shouldBe` (Just ProofOutput)
+        it "responds error output when sending hoge" $ do
+            cId <- newCoqtop
+            let command = Command "hoge."
+            res <- post ("/command/" <> showBS cId) (encode command)
+            let output = decode $ simpleBody res
+            liftIO $ output `shouldSatisfy` isJust
+            liftIO $ output `shouldSatisfy` (isJust . join . fmap coqtopOutputError)
+            liftIO $ (fmap outputType . join . fmap coqtopOutputError) output `shouldBe` (Just ErrorOutput)
+
   where
     coqtopOf n = Coqtop n undefined undefined undefined undefined undefined undefined
     showBS :: Show a => a -> BS.ByteString
     showBS = BS.pack . show
+    newCoqtop = do
+        res <- post "/start" ""
+        let Just info = decode $ simpleBody res
+        return $ initialInfoId info
