@@ -1,6 +1,8 @@
 prove-everywhere-server
 =======================
 
+[![wercker status](https://app.wercker.com/status/dfb2fb859ad25f5518439b14907a2cd5/m "wercker status")](https://app.wercker.com/project/bykey/dfb2fb859ad25f5518439b14907a2cd5)
+
 This directory provides the server for ProveEverywhere.
 
 You can also use this as a coqtop server.

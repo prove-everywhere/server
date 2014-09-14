@@ -1,0 +1,13 @@
+box: amutake/prove-everywhere-server@0.1.0
+build:
+  steps:
+    - script:
+        name: install dependencies
+        code: |
+          cabal update
+          cabal install --only-dependencies
+    - script:
+        name: build
+        code: |
+          cabal configure
+          cabal build
