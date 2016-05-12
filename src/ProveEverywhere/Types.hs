@@ -2,34 +2,34 @@
 
 module ProveEverywhere.Types where
 
-import Control.Applicative ((<$>), (<*>), empty, pure)
-import Data.Aeson
-import Data.ByteString (ByteString)
-import qualified Data.HashMap.Strict as HM
-import Data.Monoid
-import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as E
-import Data.Time.Clock (UTCTime)
-import Network.Wai.Handler.Warp (Port)
-import System.Process (ProcessHandle)
-import System.IO (Handle)
-import Text.Parsec (ParseError)
+import           Control.Applicative      (empty)
+import           Data.Aeson
+import           Data.ByteString          (ByteString)
+import qualified Data.HashMap.Strict      as HM
+import           Data.Monoid
+import           Data.Text                (Text)
+import qualified Data.Text                as T
+import qualified Data.Text.Encoding       as E
+import           Data.Time.Clock          (UTCTime)
+import           Network.Wai.Handler.Warp (Port)
+import           System.IO                (Handle)
+import           System.Process           (ProcessHandle)
+import           Text.Parsec              (ParseError)
 
 data Config = Config
-    { configPort :: Port -- ^ port number
+    { configPort        :: Port -- ^ port number
     , configMaxNumProcs :: Maybe Int -- ^ max number of coqtop processes
-    , configKillTime :: Maybe Int -- ^ per minute. default is infinity
+    , configKillTime    :: Maybe Int -- ^ per minute. default is infinity
     } deriving (Eq, Show)
 
 data Coqtop = Coqtop
-    { coqtopId :: Int
-    , coqtopStdin :: Handle
-    , coqtopStdout :: Handle
-    , coqtopStderr :: Handle
+    { coqtopId            :: Int
+    , coqtopStdin         :: Handle
+    , coqtopStdout        :: Handle
+    , coqtopStderr        :: Handle
     , coqtopProcessHandle :: ProcessHandle
-    , coqtopState :: CoqtopState
-    , coqtopLastModified :: UTCTime
+    , coqtopState         :: CoqtopState
+    , coqtopLastModified  :: UTCTime
     }
 
 instance Eq Coqtop where
@@ -64,9 +64,9 @@ instance FromJSON Coqtop where
     parseJSON _ = empty
 
 data InitialInfo = InitialInfo
-    { initialInfoId :: Int -- ^ coqtop id
+    { initialInfoId     :: Int -- ^ coqtop id
     , initialInfoOutput :: Text -- ^ coqtop initial output
-    , initialInfoState :: CoqtopState -- ^ initial state
+    , initialInfoState  :: CoqtopState -- ^ initial state
     } deriving (Eq, Show)
 
 instance ToJSON InitialInfo where
@@ -86,12 +86,12 @@ instance FromJSON InitialInfo where
 -- | The data type of output of coqtop.
 -- done + remain == length (sent_commands)
 data CoqtopOutput = CoqtopOutput
-    { coqtopOutputId :: Int -- ^ coqtop id
+    { coqtopOutputId        :: Int -- ^ coqtop id
     , coqtopOutputSucceeded :: Int -- ^ the number of succeeded commands
     , coqtopOutputRemaining :: Int -- ^ the number of remaining commands
-    , coqtopOutputLast :: Maybe Output -- ^ last output (except error)
-    , coqtopOutputError :: Maybe Output -- ^ error output
-    , coqtopOutputState :: CoqtopState -- ^ last state
+    , coqtopOutputLast      :: Maybe Output -- ^ last output (except error)
+    , coqtopOutputError     :: Maybe Output -- ^ error output
+    , coqtopOutputState     :: CoqtopState -- ^ last state
     } deriving (Eq, Show)
 
 instance ToJSON CoqtopOutput where
@@ -168,9 +168,9 @@ instance ToJSON ServerError where
         ]
 
 data CoqtopState = CoqtopState
-    { promptCurrentTheorem :: Text
-    , promptWholeStateNumber :: Integer
-    , promptTheoremStack :: [Text]
+    { promptCurrentTheorem     :: Text
+    , promptWholeStateNumber   :: Integer
+    , promptTheoremStack       :: [Text]
     , promptTheoremStateNumber :: Integer
     } deriving (Eq, Show)
 

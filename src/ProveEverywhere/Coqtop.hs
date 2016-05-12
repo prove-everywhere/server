@@ -2,21 +2,20 @@
 
 module ProveEverywhere.Coqtop where
 
-import Control.Applicative ((<$>))
-import qualified Control.Exception as E
-import Data.ByteString (ByteString)
-import qualified Data.ByteString.Char8 as B
-import Data.Text (Text)
-import qualified Data.Text as T
-import qualified Data.Text.Encoding as E
-import Data.Time.Clock (getCurrentTime)
-import Data.Monoid
-import System.Process
-import System.IO
+import qualified Control.Exception      as E
+import           Data.ByteString        (ByteString)
+import qualified Data.ByteString.Char8  as B
+import           Data.Monoid
+import           Data.Text              (Text)
+import qualified Data.Text              as T
+import qualified Data.Text.Encoding     as E
+import           Data.Time.Clock        (getCurrentTime)
+import           System.IO
+import           System.Process
 
-import ProveEverywhere.Util
-import ProveEverywhere.Types
-import ProveEverywhere.Parser
+import           ProveEverywhere.Parser
+import           ProveEverywhere.Types
+import           ProveEverywhere.Util
 
 getCoqtopVersion :: IO (Maybe (Int, Int, Int)) -- e.g., (8, 4, 4) = 8.4pl4
 getCoqtopVersion = E.handle failure $ do

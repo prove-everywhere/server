@@ -1,10 +1,10 @@
 module Main where
 
-import Options.Applicative
+import           Options.Applicative
 
-import ProveEverywhere.Types
-import ProveEverywhere.Server
-import ProveEverywhere.Coqtop (getCoqtopVersion)
+import           ProveEverywhere.Coqtop (getCoqtopVersion)
+import           ProveEverywhere.Server
+import           ProveEverywhere.Types
 
 main :: IO ()
 main = do
@@ -27,16 +27,16 @@ main = do
 
 configParser :: Parser Config
 configParser = Config
-    <$> option (long "port" <>
+    <$> option auto (long "port" <>
                 short 'p' <>
                 metavar "PORT" <>
                 help "Specify port number")
-    <*> optional (option
+    <*> optional (option auto
                   (long "number" <>
                    short 'n' <>
                    metavar "NUM_OF_PROCS" <>
                    help "Max number of coqtop processes (default: infinity)"))
-    <*> optional (option
+    <*> optional (option auto
                   (long "time" <>
                    short 't' <>
                    metavar "KILL_TIME" <>
