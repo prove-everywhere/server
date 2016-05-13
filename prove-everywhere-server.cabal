@@ -47,6 +47,11 @@ test-suite server-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test, src
   main-is:             ServerTest.hs
+  other-modules:       ProveEverywhere.Coqtop
+                     , ProveEverywhere.Parser
+                     , ProveEverywhere.Server
+                     , ProveEverywhere.Types
+                     , ProveEverywhere.Util
   build-depends:       base == 4.*
                      , hspec == 2.*
                      , hspec-wai == 0.6.*
